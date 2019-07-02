@@ -57,10 +57,25 @@ def main():
     fig = go.FigureWidget()
     fig.add_bar(x=[a for a, b in enumerate(scan)],
                 y=scan,
-                marker={'color': 'blue',
-                        'opacity': 0.6,
+                marker={'color': 'orange',
+                        'opacity': 0.8,
                         },
-                showlegend=True)
+                showlegend=True,
+                name='Scan')
+    fig.add_bar(x=[a for a, b in enumerate(connect)],
+                y=connect,
+                marker={'color': 'green',
+                        'opacity': 0.8,
+                        },
+                showlegend=True,
+                name='Connect')
+    fig.add_bar(x=[a for a, b in enumerate(pair)],
+                y=pair,
+                marker={'color': 'blue',
+                        'opacity': 0.8,
+                        },
+                showlegend=True,
+                name='Pair')
     fig.write_html('{}.html'.format(args.file))
 
 
