@@ -97,7 +97,7 @@ def put_stats_to_list(max_val, min_val, mean_val, stddev_val):
     return mylist
 
 
-def draw_figure(fig, mylist, mydict, df, color='red', myname='Generic'):
+def draw_figure(fig, mylist, mydict, color='red', myname='Generic'):
     '''
     Add plot to the figure and return the figure
 
@@ -106,7 +106,7 @@ def draw_figure(fig, mylist, mydict, df, color='red', myname='Generic'):
     '''
     fig.add_scatter(x=[a+1 for a, b in enumerate(mylist)],
                     y=mylist,
-                    mode='lines',
+                    mode='lines+markers',
                     marker={
                         'size': 5,
                         'line': {'width': 0.5},
@@ -119,33 +119,34 @@ def draw_figure(fig, mylist, mydict, df, color='red', myname='Generic'):
     return fig
 
 
+def run(fig, df, column, color):
+    '''
+    Take a column name, parse the date and plot it to the graph
+
+    Returns:
+        fig
+    '''
+    column_list = df[column]
+    split_column = split_list(column_list)
+    max_column, min_column, mean_column, stddev_column = get_stats(
+        split_column)
+    column_stats = put_stats_to_list(
+        max_column, min_column, mean_column, stddev_column)
+    # print('{}: {}, Number of values: {}'.format(
+    #     column, column_stats, len(split_column)))
+    draw_figure(fig, split_column, column_stats, color, column)
+    return
+
+
 def main():
     args = parseargs()
     df = create_df(args)
     df = clean_df(df)
-    scan_list = df['Scan']
-    connect_list = df['Connect']
-    pair_list = df['Pair']
-    scan = split_list(scan_list)
-    max_scan, min_scan, mean_scan, stddev_scan = get_stats(scan)
-    connect = split_list(connect_list)
-    max_connect, min_connect, mean_connect, stddev_connect = get_stats(connect)
-    pair = split_list(pair_list)
-    max_pair, min_pair, mean_pair, stddev_pair = get_stats(pair)
-    scan_stats = put_stats_to_list(max_scan, min_scan, mean_scan, stddev_scan)
-    connect_stats = put_stats_to_list(
-        max_connect, min_connect, mean_connect, stddev_connect)
-    pair_stats = put_stats_to_list(max_pair, min_pair, mean_pair, stddev_pair)
-    print('Scan: {}, Number of values: {}'.format(
-        scan_stats, len(scan)))
-    print('Connect: {}, Number of values: {}'.format(
-        connect_stats, len(connect)))
-    print('Pair: {}, Number of values: {}'.format(
-        pair_stats, len(pair)))
     fig = go.FigureWidget()
-    draw_figure(fig, scan, scan_stats, df, 'orange', 'Scan')
-    draw_figure(fig, connect, connect_stats, df, 'green', 'Connect')
-    draw_figure(fig, pair, pair_stats, df, 'blue', 'Pair')
+
+    run(fig, df, 'Scan', 'orange')
+    run(fig, df, 'Connect', 'green')
+    run(fig, df, 'Pair', 'blue')
 
     fig.write_html('{}.html'.format(args.file))
 
